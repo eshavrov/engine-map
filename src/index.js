@@ -2,10 +2,11 @@
 this.emjs = this.emjs || {};
 
 (function() {
-  var Container = function() {
+  let Container = function() {
     this.version = "1.1.0";
   };
-  var p = Container.prototype;
+
+  let p = Container.prototype;
   // содержит основные параметры сцены
   p.main = {};
   p.data = null;
@@ -21,7 +22,7 @@ this.emjs = this.emjs || {};
 
   p.config = function(options) {
     // значения main по умолчанию
-    var cfgDefault = {
+    let cfgDefault = {
       tooltipText: "",
       tooltipShow: false,
       width: 100,
@@ -125,7 +126,7 @@ this.emjs = this.emjs || {};
 
   // переписать копирует толко объекты верхнего уровня
   p.merge = function() {
-    var obj,
+    let obj,
       name,
       copy,
       target = arguments[0] || {},
@@ -147,7 +148,7 @@ this.emjs = this.emjs || {};
   };
 
   // -----------------------------------------------------------------------------------------------------------------
-  var SceneLayers = {
+  let SceneLayers = {
     Layer: function(name, id) {
       if (typeof name === "undefined") {
         this.name = "undefined"; // наименование слоя по умолчанию
@@ -200,10 +201,11 @@ this.emjs = this.emjs || {};
       this.visible = true;
     }
   };
+
   p.clearLayersData = function() {
     if (this.layers && this.layers.length > 0) {
-      for (var i = 0; i < this.layers.length; i++) {
-        var layer = this.layers[i];
+      for (let i = 0; i < this.layers.length; i++) {
+        let layer = this.layers[i];
         if (layer.onClearLayerData != null) {
           layer.onClearLayerData();
         }
@@ -212,9 +214,10 @@ this.emjs = this.emjs || {};
     this.coerceRenderScene();
     this.refreshScene();
   };
+
   // -----------------------------------------------------------------------------------------------------------------
   p.addLayer = function(name, onRender, visible, id, before, after, clear) {
-    var layer = new SceneLayers.Layer(name, id);
+    let layer = new SceneLayers.Layer(name, id);
     layer.onRender = onRender;
     if (before) {
       layer.onBeforeLayerRender = before;
@@ -233,8 +236,8 @@ this.emjs = this.emjs || {};
   };
 
   p.layerVisible = function(name, stat) {
-    var bb = false;
-    for (var i = this.sortLayers.length; i--; ) {
+    let bb = false;
+    for (let i = this.sortLayers.length; i--; ) {
       if (name == this.sortLayers[i]) {
         bb = true;
         if (stat == false) this.sortLayers.slice(i, 1);
@@ -246,12 +249,12 @@ this.emjs = this.emjs || {};
     }
 
     if (this.layers && this.layers.length > 0) {
-      for (var i = 0; i < this.layers.length; i++) {
+      for (let i = 0; i < this.layers.length; i++) {
         if (this.layers[i].name == name) {
           this.layers[i].visible = stat;
           // Найти привязанную маску этого слоя
           if (this.maskLayers && this.maskLayers.length > 0) {
-            for (var j = 0; j < this.maskLayers.length; j++) {
+            for (let j = 0; j < this.maskLayers.length; j++) {
               if (this.maskLayers[j].idRenderScene == this.layers[i].id) {
                 this.maskLayers[j].enable = stat;
                 break; // предположим что не бывает двойных масок
@@ -264,11 +267,12 @@ this.emjs = this.emjs || {};
     }
     this.coerceRenderScene();
   };
+
   p.layerAllVisible = function(stat) {
     this.sortLayers = [];
 
     if (this.layers && this.layers.length > 0) {
-      for (var i = 0; i < this.layers.length; i++) {
+      for (let i = 0; i < this.layers.length; i++) {
         this.layers[i].visible = stat;
       }
     }
@@ -279,7 +283,7 @@ this.emjs = this.emjs || {};
     this.sortLayers = [];
     if (this.layers && this.layers.length > 0) {
       if (this.maskLayers && this.maskLayers.length > 0) {
-        for (var j = 0; j < this.maskLayers.length; j++) {
+        for (let j = 0; j < this.maskLayers.length; j++) {
           this.maskLayers[j].enable = !stat;
         }
       }
@@ -287,18 +291,18 @@ this.emjs = this.emjs || {};
         if (stat) {
           this.sortLayers.push(name);
         } else {
-          for (var i = this.sortLayers.length; i--; ) {
+          for (let i = this.sortLayers.length; i--; ) {
             if (name == this.sortLayers[i]) {
               this.sortLayers.slice(i, 1);
             }
           }
         }
-        for (var i = 0; i < this.layers.length; i++) {
+        for (let i = 0; i < this.layers.length; i++) {
           if (this.layers[i].name == name) {
             this.layers[i].visible = stat;
             // Найти привязанную маску этого слоя
             if (this.maskLayers && this.maskLayers.length > 0) {
-              for (var j = 0; j < this.maskLayers.length; j++) {
+              for (let j = 0; j < this.maskLayers.length; j++) {
                 if (this.maskLayers[j].idRenderScene == this.layers[i].id) {
                   this.maskLayers[j].enable = stat;
                   break;
@@ -310,19 +314,19 @@ this.emjs = this.emjs || {};
           }
         }
       } else if (typeof name == "object" && name.length > 0) {
-        for (var k = 0; k < name.length; k++) {
+        for (let k = 0; k < name.length; k++) {
           this.sortLayers.push(name[k]);
         }
 
-        for (var i = 0; i < this.layers.length; i++) {
-          var _bb = true;
-          for (var k = 0; k < name.length; k++) {
+        for (let i = 0; i < this.layers.length; i++) {
+          let _bb = true;
+          for (let k = 0; k < name.length; k++) {
             if (this.layers[i].name == name[k]) {
               this.layers[i].visible = stat;
               _bb = false;
               // Найти привязанную маску этого слоя
               if (this.maskLayers && this.maskLayers.length > 0) {
-                for (var j = 0; j < this.maskLayers.length; j++) {
+                for (let j = 0; j < this.maskLayers.length; j++) {
                   if (this.maskLayers[j].idRenderScene == this.layers[i].id) {
                     this.maskLayers[j].enable = stat;
                     break;
@@ -351,7 +355,7 @@ this.emjs = this.emjs || {};
   };
 
   p.drawScene = p.refreshScene = function() {
-    var need = this.needToReRenderScene();
+    let need = this.needToReRenderScene();
     if (!need[0]) {
       if (need[1]) {
         this.maskRender();
@@ -359,17 +363,17 @@ this.emjs = this.emjs || {};
       return;
     }
     this.iterationCount++;
-    var timeBegin = new Date();
+    let timeBegin = new Date();
     if (this.main.onBeforeRender != null) this.main.onBeforeRender();
     if (this.canvas && this.canvas.getContext) {
       this.ctx.clearRect(0, 0, this.main.width, this.main.height);
       if (this.layers && this.layers.length > 0) {
-        for (var i = 0, iCount = this.layers.length; i < iCount; i++) {
+        for (let i = 0, iCount = this.layers.length; i < iCount; i++) {
           this.layers[i].__ = true;
         }
 
-        for (var j = 0, jCount = this.sortLayers.length; j < jCount; j++) {
-          for (var i = 0, iCount = this.layers.length; i < iCount; i++) {
+        for (let j = 0, jCount = this.sortLayers.length; j < jCount; j++) {
+          for (let i = 0, iCount = this.layers.length; i < iCount; i++) {
             if (
               this.sortLayers[j] == this.layers[i].name &&
               this.layers[i].__ &&
@@ -381,7 +385,7 @@ this.emjs = this.emjs || {};
           }
         }
 
-        for (var i = 0, iCount = this.layers.length; i < iCount; i++) {
+        for (let i = 0, iCount = this.layers.length; i < iCount; i++) {
           if (this.layers[i].visible && this.layers[i].__) {
             this.layers[i].render(this.ctx, this.main);
             this.layers[i].__ = false;
@@ -397,27 +401,29 @@ this.emjs = this.emjs || {};
     }
     this.needRender.coerceNotRenderMask = false;
 
-    var timeEnd = new Date();
+    let timeEnd = new Date();
     this.main.timeRender = timeEnd.getTime() - timeBegin.getTime();
   };
 
   p.resizeCanvas = function(width, height) {
-    if (this.canvas) {
-      this.main.width = width;
-      this.main.height = height;
-      this.canvas.width = this.main.width;
-      this.canvas.height = this.main.height;
-      if (this.canvasMask) {
-        this.canvasMask.width = this.main.width;
-        this.canvasMask.height = this.main.height;
+    const { main, canvas, canvasMask } = this;
+    if (canvas) {
+      main.width = width;
+      main.height = height;
+      canvas.width = width;
+      canvas.height = height;
+      if (canvasMask) {
+        canvasMask.width = width;
+        canvasMask.height = height;
       }
 
-      this.canvas.ctx = this.ctx = this.canvas.getContext("2d");
-      if (this.canvasMask) {
-        this.canvasMask.ctx = this.ctxMask = this.canvasMask.getContext("2d");
+      canvas.ctx = this.ctx = canvas.getContext("2d");
+      if (canvasMask) {
+        canvasMask.ctx = this.ctxMask = canvasMask.getContext("2d");
       }
     }
   };
+
   p.getIterations = function() {
     return this.iterationCount;
   };
@@ -429,6 +435,7 @@ this.emjs = this.emjs || {};
     if (!text) this.main.tooltipShow = false;
     this.moveToolTip(mouse);
   };
+
   p.showToolTipRender = function(render, data, mouse) {
     this.main.tooltipShow = true;
     this.main.tooltipText = false;
@@ -495,15 +502,16 @@ this.emjs = this.emjs || {};
 
   p.mouseControls = function(options, target) {
     options = options || {};
-    var cursor = options.cursor || "off";
+    let cursor = options.cursor || "off";
 
     // События пользователя
-    var customMouseMove = options.mouseMove || null;
-    var customMouseDown = options.mouseDown || null;
-    var customMouseUp = options.mouseUp || null;
-    var customMouseWheel = options.mouseWheel || null;
-    var customMouseOut = options.mouseOut || null;
-    var customMouseOver = options.mouseOver || null;
+    let customMouseMove = options.mouseMove || null;
+    let customMouseDown = options.mouseDown || null;
+    let customMouseUp = options.mouseUp || null;
+    let customMouseWheel = options.mouseWheel || null;
+    let customMouseOut = options.mouseOut || null;
+    let customMouseOver = options.mouseOver || null;
+
     // внутренние события (расширения)
     if (!!options._extMouseMove && typeof options._extMouseMove == "function")
       this.observer._extMouseMove = options._extMouseMove;
@@ -559,6 +567,7 @@ this.emjs = this.emjs || {};
       target.mouse.lastX = target.mouse.x;
       target.mouse.lastY = target.mouse.y;
     };
+
     // нажили на мышь
     this._mouseDown = function(e) {
       e.preventDefault();
@@ -573,8 +582,8 @@ this.emjs = this.emjs || {};
       if (!!customMouseDown && typeof customMouseDown == "function")
         customMouseDown(target.mouse, e);
     };
-    // отжали мышь
 
+    // отжали мышь
     this._mouseUp = function(e) {
       e.preventDefault();
       target.mouse.drag = 2;
@@ -589,10 +598,11 @@ this.emjs = this.emjs || {};
         customMouseUp(target.mouse, e);
       target.mouse.button = -1;
     };
+
     // скролл
     this._mouseWheel = function(e) {
       if (false == !!e) e = window.e;
-      var direction =
+      let direction =
         (e.wheelDelta ? e.wheelDelta / 120 : e.detail / -3) || false;
       target.mouse.wheel = direction;
       if (direction) {
@@ -605,6 +615,7 @@ this.emjs = this.emjs || {};
           customMouseWheel(target.mouse, e);
       }
     };
+
     // курсор вышел из области элемента
     this._mouseOut = function(e) {
       target.mouse.button = -1; // отключить драг
@@ -617,6 +628,7 @@ this.emjs = this.emjs || {};
       if (!!customMouseOut && typeof customMouseOut == "function")
         customMouseOut(target.mouse, e);
     };
+
     // курсор попал в область элемента
     this._mouseOver = function(e) {
       target.mouse.button = -1; // отключить драг
@@ -693,7 +705,7 @@ this.emjs = this.emjs || {};
     this.iterationMaskCount = 0;
     this.iterationMaskShowCount = 0;
 
-    var optDefault = {
+    let optDefault = {
       move: true, // авто перемещение
       autoRendering: true, // авто обновление
       zoomDeltaX: 2, // коэффициент масштаба
@@ -763,8 +775,8 @@ this.emjs = this.emjs || {};
   };
 
   p.zoom = function(position, z) {
-    var scale_calcX = this.main.scaleX;
-    var scale_calcY = this.main.scaleY;
+    let scale_calcX = this.main.scaleX;
+    let scale_calcY = this.main.scaleY;
     if (z > 0) {
       if (this.observer.freezeScaleX <= 0 && this.observer.freezeScaleX != -2) {
         this.observer._baseScaleX =
@@ -794,7 +806,7 @@ this.emjs = this.emjs || {};
     }
     this.main.scaleX = this.observer._baseScaleX;
     this.main.scaleY = this.observer._baseScaleY;
-    var last = {
+    let last = {
       x: this.main.x,
       y: this.main.y,
       scale_calcX: scale_calcX,
@@ -819,8 +831,8 @@ this.emjs = this.emjs || {};
   };
 
   p.scopeCalculation = function(main, scaling, last) {
-    var ddX = 0;
-    var ddY = 0;
+    let ddX = 0;
+    let ddY = 0;
 
     // Проверка на пользовательские ограничения масштаба
     // Минимальные
@@ -828,7 +840,7 @@ this.emjs = this.emjs || {};
       this.observer.minScaleX &&
       this.main.scaleX <= this.observer.minScaleX
     ) {
-      var tmp = getZoomLevelBase(
+      let tmp = getZoomLevelBase(
         this.observer.minScaleX,
         this.observer.baseScaleX,
         this.observer.zoomDeltaX
@@ -845,7 +857,7 @@ this.emjs = this.emjs || {};
       this.observer.minScaleY &&
       this.main.scaleY <= this.observer.minScaleY
     ) {
-      var tmp = getZoomLevelBase(
+      let tmp = getZoomLevelBase(
         this.observer.minScaleY,
         this.observer.baseScaleY,
         this.observer.zoomDeltaY
@@ -862,7 +874,7 @@ this.emjs = this.emjs || {};
       this.observer.maxScaleX &&
       this.main.scaleX >= this.observer.maxScaleX
     ) {
-      var tmp = getZoomLevelBase(
+      let tmp = getZoomLevelBase(
         this.observer.maxScaleX,
         this.observer.baseScaleX,
         this.observer.zoomDeltaX
@@ -879,7 +891,7 @@ this.emjs = this.emjs || {};
       this.observer.maxScaleY &&
       this.main.scaleY >= this.observer.maxScaleY
     ) {
-      var tmp = getZoomLevelBase(
+      let tmp = getZoomLevelBase(
         this.observer.maxScaleY,
         this.observer.baseScaleY,
         this.observer.zoomDeltaY
@@ -945,14 +957,14 @@ this.emjs = this.emjs || {};
       }
 
       if (this.observer.scopeXLeft != null) {
-        var xl = -main.x / main.scaleX;
+        let xl = -main.x / main.scaleX;
         if (xl < this.observer.scopeXLeft - ddX) {
           this.main.x = -(this.observer.scopeXLeft - ddX) * main.scaleX;
         }
       }
 
       if (this.observer.scopeXRight != null) {
-        var xr = (main.width - main.x) / main.scaleX;
+        let xr = (main.width - main.x) / main.scaleX;
         if (xr > this.observer.scopeXRight + ddX) {
           this.main.x =
             -(this.observer.scopeXRight + ddX) * main.scaleX + main.width;
@@ -960,14 +972,14 @@ this.emjs = this.emjs || {};
       }
 
       if (this.observer.scopeYTop != null) {
-        var yt = main.y / main.scaleY;
+        let yt = main.y / main.scaleY;
         if (yt > -this.observer.scopeYTop + ddY) {
           this.main.y = (-this.observer.scopeYTop + ddY) * main.scaleY;
         }
       }
 
       if (this.observer.scopeYBottom != null) {
-        var yb = (-main.height + main.y) / main.scaleY;
+        let yb = (-main.height + main.y) / main.scaleY;
         if (yb < -this.observer.scopeYBottom - ddY) {
           this.main.y =
             (-this.observer.scopeYBottom - ddY) * main.scaleY + main.height;
@@ -996,13 +1008,13 @@ this.emjs = this.emjs || {};
     this.calcObserver();
     this.scopeCalculation(this.main, true);
   };
+
   p.minScale = function() {
-    // console.log('+++');
     this.main.scaleX = this.observer.minScaleFreeze;
     this.main.scaleY = this.observer.minScaleFreeze;
     this.observer._baseScaleX = this.main.scaleX;
     this.observer._baseScaleY = this.main.scaleY;
-    var tmp = getZoomLevelBase(
+    let tmp = getZoomLevelBase(
       this.observer.minScaleX,
       this.observer.baseScaleX,
       this.observer.zoomDeltaX
@@ -1010,7 +1022,7 @@ this.emjs = this.emjs || {};
     this.observer.zoomLevelX = tmp.level;
     this.observer.freezeScaleX = -1;
 
-    var tmp = getZoomLevelBase(
+    let tmp = getZoomLevelBase(
       this.observer.minScaleY,
       this.observer.baseScaleY,
       this.observer.zoomDeltaY
@@ -1029,7 +1041,7 @@ this.emjs = this.emjs || {};
 
     if (this.observer.scopeXLeft != null && this.observer.scopeXRight != null) {
       if (this.observer.scopeXRight < this.observer.scopeXLeft) {
-        var tmp = this.observer.scopeXRight;
+        let tmp = this.observer.scopeXRight;
         this.observer.scopeXRight = this.observer.scopeXLeft;
         this.observer.scopeXLeft = tmp;
       }
@@ -1038,7 +1050,7 @@ this.emjs = this.emjs || {};
 
     if (this.observer.scopeYTop != null && this.observer.scopeYBottom != null) {
       if (this.observer.scopeYBottom < this.observer.scopeYTop) {
-        var tmp = this.observer.scopeYTop;
+        let tmp = this.observer.scopeYTop;
         this.observer.scopeYTop = this.observer.scopeYBottom;
         this.observer.scopeYBottom = tmp;
       }
@@ -1095,12 +1107,12 @@ this.emjs = this.emjs || {};
 
     // Опеределяем текущее смещение базы мастаба
 
-    var tmpX = getZoomLevelBase(
+    let tmpX = getZoomLevelBase(
       Math.max(this.observer.minScaleFreeze, this.main.scaleX),
       this.observer.baseScaleX,
       this.observer.zoomDeltaX
     );
-    var tmpY = getZoomLevelBase(
+    let tmpY = getZoomLevelBase(
       Math.max(this.observer.minScaleFreeze, this.main.scaleY),
       this.observer.baseScaleY,
       this.observer.zoomDeltaY
@@ -1129,6 +1141,7 @@ this.emjs = this.emjs || {};
       this.observer.zoomDeltaX
     );
   };
+
   p.setMinZoomLevelY = function(level) {
     this.observer.minScaleY = levelZoomToBaseScale(
       level,
@@ -1136,6 +1149,7 @@ this.emjs = this.emjs || {};
       this.observer.zoomDeltaY
     );
   };
+
   p.setMinZoomLevel = function(level) {
     this.setMinZoomLevelX(level);
     this.setMinZoomLevelY(level);
@@ -1148,6 +1162,7 @@ this.emjs = this.emjs || {};
       this.observer.zoomDeltaX
     );
   };
+
   p.setMaxZoomLevelY = function(level) {
     this.observer.maxScaleY = levelZoomToBaseScale(
       level,
@@ -1155,6 +1170,7 @@ this.emjs = this.emjs || {};
       this.observer.zoomDeltaY
     );
   };
+
   p.setMaxZoomLevel = function(level) {
     this.setMaxZoomLevelX(level);
     this.setMaxZoomLevelY(level);
@@ -1180,6 +1196,7 @@ this.emjs = this.emjs || {};
       this.observer.zoomDeltaX
     );
   };
+
   p.getBaseScaleY = function(z) {
     return levelZoomToBaseScale(
       z,
@@ -1190,7 +1207,7 @@ this.emjs = this.emjs || {};
 
   // определить уровень масштаба и значение масштаба базы, от текущего масштаба
   function getZoomLevelBase(scale, base, delta) {
-    var res = {
+    let res = {
       level: 0,
       scale: base
     };
@@ -1236,7 +1253,7 @@ this.emjs = this.emjs || {};
 
       p.data = [new Int16Array(height * width), new Int8Array(height * width)];
 
-      for (var i = 0; i < height * width; i++) {
+      for (let i = 0; i < height * width; i++) {
         p.data[0][i] = -1; // [index,group]
         p.data[1][i] = -1; // [index,group]
       }
@@ -1276,7 +1293,7 @@ this.emjs = this.emjs || {};
   };
 
   p.addMask = function(name, onRender, idRenderScene) {
-    var mask = new this.MaskImage.ImageData(this.main.width, this.main.height);
+    let mask = new this.MaskImage.ImageData(this.main.width, this.main.height);
     mask.onRender = onRender;
     if (typeof idRenderScene === "undefined") {
       mask.idRenderScene = -1;
@@ -1289,7 +1306,7 @@ this.emjs = this.emjs || {};
   p.maskRender = function() {
     this.iterationMaskCount++;
     if (this.maskLayers && this.maskLayers.length > 0) {
-      for (var i = 0; i < this.maskLayers.length; i++) {
+      for (let i = 0; i < this.maskLayers.length; i++) {
         if (this.maskLayers[i].enable) {
           // если включена маска, то
           this.maskLayers[i].render(this);
@@ -1297,11 +1314,12 @@ this.emjs = this.emjs || {};
       }
     }
   };
+
   p.maskLayersReSize = function(width, height) {
     this.resizeCanvas(width, height);
     // именить размер маскам
     if (this.maskLayers && this.maskLayers.length > 0) {
-      for (var i = 0; i < this.maskLayers.length; i++) {
+      for (let i = 0; i < this.maskLayers.length; i++) {
         this.maskLayers[i].resize(width, height);
       }
     }
@@ -1310,12 +1328,12 @@ this.emjs = this.emjs || {};
   p.getObjects = function(x, y) {
     x = (x / p.MaskImage.dx) << 0;
     y = (y / p.MaskImage.dy) << 0;
-    var tmp = new Array();
+    let tmp = new Array();
     if (this.maskLayers && this.maskLayers.length > 0) {
-      for (var i = 0; i < this.maskLayers.length; i++) {
+      for (let i = 0; i < this.maskLayers.length; i++) {
         if (this.maskLayers[i].enable) {
           // если включена маска, то
-          var _select = this.maskLayers[i].getPixel(x, y, true);
+          let _select = this.maskLayers[i].getPixel(x, y, true);
           if (_select[0] != -1) {
             tmp.push(_select);
           }
@@ -1324,15 +1342,16 @@ this.emjs = this.emjs || {};
     }
     return tmp;
   };
+
   p.getObject = function(x, y) {
     x = (x / p.MaskImage.dx) << 0;
     y = (y / p.MaskImage.dy) << 0;
 
     if (this.maskLayers && this.maskLayers.length > 0) {
-      for (var i = this.maskLayers.length - 1; i >= 0; i--) {
+      for (let i = this.maskLayers.length - 1; i >= 0; i--) {
         if (this.maskLayers[i].enable) {
           // если включена маска, то
-          var _select = this.maskLayers[i].getPixel(x, y, true);
+          let _select = this.maskLayers[i].getPixel(x, y, true);
           if (_select[0] != -1) {
             return _select;
           }
@@ -1345,18 +1364,19 @@ this.emjs = this.emjs || {};
   // Очистка области
   p.MaskImage.ImageData.prototype.clearRect = function() {
     if (p.data[0].length > 0) {
-      for (var i = 0, iCount = p.data[0].length; i < iCount; i++) {
+      for (let i = 0, iCount = p.data[0].length; i < iCount; i++) {
         p.data[0][i] = -1;
         p.data[1][i] = -1;
       }
     }
   };
+
   p.MaskImage.ImageData.prototype.resize = function(width, height) {
     p.data = null;
 
     p.data = [new Int16Array(height * width), new Int8Array(height * width)];
 
-    for (var i = 0; i < height * width; i++) {
+    for (let i = 0; i < height * width; i++) {
       p.data[0][i] = -1; // [index,group]
       p.data[1][i] = -1; // [index,group]
     }
@@ -1392,17 +1412,17 @@ this.emjs = this.emjs || {};
       p.data[0][x + y * this.width] = color;
       p.data[1][x + y * this.width] = this.group;
     } else if (x < this.width && x >= 0 && y < this.height && y >= 0) {
-      var index = this.lineWidth;
+      let index = this.lineWidth;
       if (index > this.lineWidths.length - 1) {
         index = this.lineWidths.length - 1;
       }
       for (
-        var j = this.lineWidths[index][0];
+        let j = this.lineWidths[index][0];
         j < this.lineWidths[index][1];
         j++
       ) {
         for (
-          var i = this.lineWidths[index][0];
+          let i = this.lineWidths[index][0];
           i < this.lineWidths[index][1];
           i++
         ) {
@@ -1419,7 +1439,6 @@ this.emjs = this.emjs || {};
       }
     }
   };
-  //
 
   p.MaskImage.ImageData.prototype.moveToStroke = function(x, y, minimization) {
     !0 === minimization || (minimization = !1);
@@ -1427,11 +1446,12 @@ this.emjs = this.emjs || {};
     this.moveTo(x, y, true);
     this.putPixel(x, y, this.index, undefined, true);
   };
+
   p.MaskImage.ImageData.prototype.lineToStroke = function(x, y, minimization) {
     !0 === minimization || (minimization = !1);
     !1 === minimization && ((x = (x / this.dx) << 0), (y = (y / this.dy) << 0));
     this.lineTo(x, y, true);
-    var iEnd = this.pathArray.length;
+    let iEnd = this.pathArray.length;
     if (this.pathArray.length > 1) {
       this.drawLine(
         this.pathArray[iEnd - 1][0],
@@ -1442,6 +1462,7 @@ this.emjs = this.emjs || {};
       );
     }
   };
+
   p.MaskImage.ImageData.prototype.cutLine = function(
     x1,
     y1,
@@ -1470,7 +1491,7 @@ this.emjs = this.emjs || {};
 
     if (isNaN(vect)) vect = 1;
     if (x1 > x2) {
-      var t = x1;
+      let t = x1;
       x1 = x2;
       x2 = t;
     }
@@ -1495,7 +1516,7 @@ this.emjs = this.emjs || {};
       (x = (x / this.dx) << 0));
     if (isNaN(vect)) vect = 1;
     if (y1 > y2) {
-      var t = y1;
+      let t = y1;
       y1 = y2;
       y2 = t;
     }
@@ -1526,7 +1547,7 @@ this.emjs = this.emjs || {};
     if (y + h > this.height) h = this.height - y;
 
     if (w >= 0 && h >= 0) {
-      for (var i = 0; i < h; i++) {
+      for (let i = 0; i < h; i++) {
         this.hLine(x, x + w - 1, y + i, undefined, true);
       }
     }
@@ -1578,14 +1599,14 @@ this.emjs = this.emjs || {};
     } else if (x1 == x2) {
       this.vLine(y1, y2, x1, undefined, true);
     } else if (this.cutLine(x1, y1, x2, y2)) {
-      var Z = 0;
-      var kx, ky, max_dev, step_small;
+      let Z = 0;
+      let kx, ky, max_dev, step_small;
       // выбираем направление рисования
       if (Math.abs(x1 - x2) >= Math.abs(y1 - y2)) {
         // по горизонтали
         // всегда рисуем слева направо
         if (x1 > x2) {
-          var t = x1;
+          let t = x1;
           x1 = x2;
           x2 = t;
           t = y1;
@@ -1615,7 +1636,7 @@ this.emjs = this.emjs || {};
         // по вертикали
         // всегда рисуем сверху вниз
         if (y1 > y2) {
-          var t = x1;
+          let t = x1;
           x1 = x2;
           x2 = t;
           t = y1;
@@ -1650,7 +1671,7 @@ this.emjs = this.emjs || {};
       ((x = (x / this.dx) << 0),
       (y = (y / this.dy) << 0),
       (r = (1 + r / this.dx) << 0));
-    var z0 = 0,
+    let z0 = 0,
       x0 = 0,
       y0 = r;
     while (x0 <= y0) {
@@ -1679,7 +1700,7 @@ this.emjs = this.emjs || {};
       ((x = (x / this.dx) << 0),
       (y = (y / this.dy) << 0),
       (r = (1 + r / this.dx) << 0));
-    var z0 = 0,
+    let z0 = 0,
       x0 = 0,
       y0 = r;
     if (
@@ -1739,6 +1760,7 @@ this.emjs = this.emjs || {};
   p.MaskImage.ImageData.prototype.beginPath = function() {
     // this.pathArray.length = 0;
   };
+
   p.MaskImage.ImageData.prototype.measureText = function(text) {
     // this.pathArray.length = 0;
     return { width: (text.length * 8) / this.dx };
@@ -1774,7 +1796,7 @@ this.emjs = this.emjs || {};
 
   p.MaskImage.ImageData.prototype.stroke = function() {
     if (this.pathArray.length > 1) {
-      for (var i = 0; i < this.pathArray.length - 1; i++) {
+      for (let i = 0; i < this.pathArray.length - 1; i++) {
         this.drawLine(
           this.pathArray[i][0],
           this.pathArray[i][1],
@@ -1789,8 +1811,8 @@ this.emjs = this.emjs || {};
   p.MaskImage.ImageData.prototype.fill = function() {
     if (this.pathArray.length > 1) {
       if (this.pathArray.length > 1) {
-        var my = this.pathArray[0][1] << 0;
-        for (var i = 0; i < this.pathArray.length; i++) {
+        let my = this.pathArray[0][1] << 0;
+        for (let i = 0; i < this.pathArray.length; i++) {
           //  this.pathArray[i][0] = this.pathArray[i][0]<<0;
           //  this.pathArray[i][1] = this.pathArray[i][1]<<0;
           if (my < this.pathArray[i][1]) {
@@ -1798,23 +1820,23 @@ this.emjs = this.emjs || {};
           }
         }
 
-        for (var i = 0; i < this.pathArray.length; i++) {
+        for (let i = 0; i < this.pathArray.length; i++) {
           if (this.pathArray[i][1] == my) {
             break;
           } else {
-            var tmp = this.pathArray.shift();
+            let tmp = this.pathArray.shift();
             this.pathArray.push(tmp);
           }
         }
       }
 
-      var pAE = [],
+      let pAE = [],
         pGET = [],
         pAET = []; // AET
       function getAET(sl, target) {
         // 1. Удаляю ребра из AET
         if (pAET && pAET.length > 0) {
-          for (var i = 0; i < pAET.length; i++) {
+          for (let i = 0; i < pAET.length; i++) {
             if (pAET[i][0] === sl) {
               pAET.splice(i, 1);
               i--;
@@ -1823,7 +1845,7 @@ this.emjs = this.emjs || {};
         }
         // 2. изменяю x координаты в AET
         if (pAET && pAET.length > 0) {
-          for (var i = 0; i < pAET.length; i++) {
+          for (let i = 0; i < pAET.length; i++) {
             pAET[i][1] += pAET[i][2];
           }
         }
@@ -1831,7 +1853,7 @@ this.emjs = this.emjs || {};
         if (pGET && pGET.length > 0) {
           do {
             if (pGET[0][0] === sl) {
-              var line = pGET.shift();
+              let line = pGET.shift();
               pAET.push([line[1], line[2], line[3]]);
             } else {
               break;
@@ -1843,18 +1865,18 @@ this.emjs = this.emjs || {};
       }
 
       if (this.pathArray && this.pathArray.length > 1) {
-        var ymin = 0,
+        let ymin = 0,
           ymax = 0,
           xval = 0;
-        for (var i = 0; i < this.pathArray.length; i++) {
-          var _f = i,
+        for (let i = 0; i < this.pathArray.length; i++) {
+          let _f = i,
             _t = 0;
           if (i < this.pathArray.length - 1) {
             _t = i + 1;
           } else {
             _t = 0;
           }
-          var m = null;
+          let m = null;
           if (this.pathArray[_f][1] > this.pathArray[_t][1]) {
             ymin = this.pathArray[_t][1];
             xval = this.pathArray[_t][0];
@@ -1884,7 +1906,7 @@ this.emjs = this.emjs || {};
       if (pAE && pAE.length > 0) {
         pGET.push([pAE[0][0], pAE[0][1], pAE[0][2], pAE[0][3]]);
         if (pAE.length > 1) {
-          for (var i = 1; i < pAE.length; i++) {
+          for (let i = 1; i < pAE.length; i++) {
             if (pAE[i][3] != null) {
               pGET.push([pAE[i][0], pAE[i][1], pAE[i][2], pAE[i][3]]);
             }
@@ -1896,13 +1918,13 @@ this.emjs = this.emjs || {};
       pGET.sort(this.compare.v0);
       if (pGET && pGET.length > 0) {
         for (
-          var sl = pGET[0][0], slCount = pGET[pGET.length - 1][1] + 1;
+          let sl = pGET[0][0], slCount = pGET[pGET.length - 1][1] + 1;
           sl < slCount;
           sl++
         ) {
           getAET(sl, this);
           if (pAET && pAET.length > 0 && pAET.length % 2 === 0) {
-            for (var i = 0; i < pAET.length / 2; i++) {
+            for (let i = 0; i < pAET.length / 2; i++) {
               this.hLine(pAET[i * 2][1], pAET[i * 2 + 1][1], sl, 0, true); // result
             }
           }
@@ -1929,6 +1951,7 @@ this.emjs = this.emjs || {};
   p.getMaskIterations = function() {
     return this.iterationMaskCount;
   };
+
   p.getMaskShowIterations = function() {
     return this.iterationMaskShowCount;
   };
@@ -1937,8 +1960,8 @@ this.emjs = this.emjs || {};
     this.iterationMaskShowCount++;
 
     if (this.maskLayers && this.maskLayers.length > 0) {
-      for (var j = 0; j < this.main.height; j++) {
-        for (var i = 0; i < this.main.width; i++) {
+      for (let j = 0; j < this.main.height; j++) {
+        for (let i = 0; i < this.main.width; i++) {
           if (this.getObject(i, j)[0] != -1) {
             if (this.getObject(i, j)[1] == 13) {
               ctx.fillStyle = "rgba(255,255,255,0.1)";
@@ -1979,7 +2002,7 @@ this.emjs = this.emjs || {};
   };
 
   p.needToReRenderScene = function() {
-    var res = false;
+    let res = false;
     if (this.needRender.coerceRender === true) {
       res = true;
     }
@@ -1992,7 +2015,7 @@ this.emjs = this.emjs || {};
     ) {
       res = true;
     }
-    var resMask = res;
+    let resMask = res;
     if (this.needRender.coerceMask === true) {
       resMask = true;
     }
