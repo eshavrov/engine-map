@@ -1,3 +1,43 @@
+const DEFAULT_CONFIG = {
+  tooltipText: "",
+  tooltipShow: false,
+  width: 100,
+  height: 100,
+  x: 0,
+  y: 0,
+  scaleX: 1,
+  scaleY: 1,
+  twinScaling: true, // спаренный скроллинг сцены (равномерное изменение обцис и ординат)
+  // события
+  onBeforeRender: null,
+  onAfterRender: null,
+  timeRender: 0,
+  canvasMaskEnabled: false
+};
+
+let DEFAULT_CONFIG_OBSERVER = {
+  move: true, // авто перемещение
+  autoRendering: true, // авто обновление
+  zoomDeltaX: 2, // коэффициент масштаба
+  zoomDeltaY: 2, // коэффициент масштаба
+  baseScaleX: 1, // база масштаба
+  baseScaleY: 1, // база масштаба
+  zoomLevelX: 0, // Уровень зума относително базы
+  zoomLevelY: 0, // Уровень зума относително базы
+  scalingType: "twin", // 'twin','x','y'
+  discreteBasisScale: false,
+  scope: false,
+  scopeXLeft: null,
+  scopeXRight: null,
+  scopeYTop: null,
+  scopeYBottom: null,
+  fixScaling: "none", // none, min, max, custom
+  minScaleX: null,
+  minScaleY: null,
+  maxScaleX: null,
+  maxScaleY: null
+};
+
 const EngineMap = function() {
   this.version = "1.1.0";
 };
@@ -16,25 +56,9 @@ p.observer = {
 p.iterationCount = 0; // колличество перерисовок сцены (ре-рендер)
 p._drag = false; // признак перемещения сцены в контейнере
 
-p.config = function(options) {
-  // значения main по умолчанию
-  let cfgDefault = {
-    tooltipText: "",
-    tooltipShow: false,
-    width: 100,
-    height: 100,
-    x: 0,
-    y: 0,
-    scaleX: 1,
-    scaleY: 1,
-    twinScaling: true, // спаренный скроллинг сцены (равномерное изменение обцис и ординат)
-    // события
-    onBeforeRender: null,
-    onAfterRender: null,
-    timeRender: 0,
-    canvasMaskEnabled: false
-  };
-  this.main = this.merge(cfgDefault, options || {});
+p.config = function(options = {}) {
+  this.main = { ...DEFAULT_CONFIG, ...options };
+
   // определение Х координаты на сцене (из мировых в координаты сцены)
   this.main.getX = function(x) {
     if (!isNaN(this.x) && !isNaN(this.scaleX)) {
@@ -43,6 +67,7 @@ p.config = function(options) {
       return 0;
     }
   };
+
   // определение Y координаты на сцене (из мировых в координаты сцены)
   this.main.getY = function(y) {
     if (!isNaN(this.y) && !isNaN(this.scaleY)) {
@@ -63,6 +88,7 @@ p.config = function(options) {
       return 0;
     }
   };
+
   this.main.calcXValue = function(value) {
     if (!isNaN(this.scaleX)) {
       return value / this.scaleX;
@@ -70,6 +96,7 @@ p.config = function(options) {
       return 0;
     }
   };
+
   // определение Y размера на сцене (из мировых в координаты сцены)
   this.main.getValueY = function(value) {
     if (!isNaN(this.scaleY)) {
@@ -78,6 +105,7 @@ p.config = function(options) {
       return 0;
     }
   };
+
   this.main.getSceneX = function(x) {
     if (!isNaN(this.x) && !isNaN(this.scaleX)) {
       return ((x - this.x) / this.scaleX) << 0;
@@ -85,6 +113,7 @@ p.config = function(options) {
       return 0;
     }
   };
+
   // определение Y координаты на сцене (из мировых в координаты сцены)
   this.main.getSceneY = function(y) {
     if (!isNaN(this.y) && !isNaN(this.scaleY)) {
@@ -93,6 +122,8 @@ p.config = function(options) {
       return 0;
     }
   };
+
+  return this;
 };
 
 p.init = function() {
@@ -102,6 +133,7 @@ p.init = function() {
   this.canvas.ctx = this.ctx = this.canvas.getContext("2d");
   this.layers = new Array();
   this.sortLayers = new Array();
+
   if (this.main.canvasMaskEnabled) {
     this.canvasMask = document.createElement("canvas");
     this.canvasMask.id = "emjs-canvas-mask";
@@ -495,7 +527,7 @@ p.mouse = {
   downY: 0 // Координаты позизии мыши в момент нажатия
 };
 
-p.mouseControls = function(options, target) {
+p.mouseControls = function(options) {
   options = options || {};
   let cursor = options.cursor || "off";
 
@@ -522,9 +554,9 @@ p.mouseControls = function(options, target) {
     this.observer._extMouseOver = options._extMouseOver;
   if (cursor !== "on") {
     if (cursor === "off") {
-      target.main.elObserver.style.cursor = "none";
+      this.main.elObserver.style.cursor = "none";
     } else {
-      target.main.elObserver.style.cursor = cursor;
+      this.main.elObserver.style.cursor = cursor;
     }
   }
 
@@ -535,63 +567,60 @@ p.mouseControls = function(options, target) {
     //  M.mouse.y = e.offsetY;
     if (!e.offsetX) {
       //Mozilla
-      target.mouse.x = e.clientX;
-      target.mouse.y = e.clientY;
+      this.mouse.x = e.clientX;
+      this.mouse.y = e.clientY;
     } else {
       // Chrome
-      target.mouse.x = e.offsetX;
-      target.mouse.y = e.offsetY;
+      this.mouse.x = e.offsetX;
+      this.mouse.y = e.offsetY;
     }
 
-    target.mouse.wheel = 0;
-    if (target.mouse.button != -1) {
-      target.mouse.drag = 1;
+    this.mouse.wheel = 0;
+    if (this.mouse.button != -1) {
+      this.mouse.drag = 1;
     }
-    if (
-      target.mouse.lastX != target.mouse.x ||
-      target.mouse.lastY != target.mouse.y
-    ) {
+    if (this.mouse.lastX != this.mouse.x || this.mouse.lastY != this.mouse.y) {
       if (
-        !!target.observer._extMouseMove &&
-        typeof target.observer._extMouseMove == "function"
+        !!this.observer._extMouseMove &&
+        typeof this.observer._extMouseMove == "function"
       )
-        target.observer._extMouseMove(target.mouse, e);
+        this.observer._extMouseMove(this.mouse, e);
       if (!!customMouseMove && typeof customMouseMove == "function")
-        customMouseMove(target.mouse, e);
+        customMouseMove(this.mouse, e);
     }
-    target.mouse.lastX = target.mouse.x;
-    target.mouse.lastY = target.mouse.y;
+    this.mouse.lastX = this.mouse.x;
+    this.mouse.lastY = this.mouse.y;
   };
 
   // нажили на мышь
   this._mouseDown = function(e) {
     e.preventDefault();
-    target.mouse.button = e.button;
-    target.mouse.downX = target.mouse.x;
-    target.mouse.downY = target.mouse.y;
+    this.mouse.button = e.button;
+    this.mouse.downX = this.mouse.x;
+    this.mouse.downY = this.mouse.y;
     if (
-      !!target.observer._extMouseDown &&
-      typeof target.observer._extMouseDown == "function"
+      !!this.observer._extMouseDown &&
+      typeof this.observer._extMouseDown == "function"
     )
-      target.observer._extMouseDown(target.mouse, e);
+      this.observer._extMouseDown(this.mouse, e);
     if (!!customMouseDown && typeof customMouseDown == "function")
-      customMouseDown(target.mouse, e);
+      customMouseDown(this.mouse, e);
   };
 
   // отжали мышь
   this._mouseUp = function(e) {
     e.preventDefault();
-    target.mouse.drag = 2;
-    target.mouse.button = e.button;
+    this.mouse.drag = 2;
+    this.mouse.button = e.button;
 
     if (
-      !!target.observer._extMouseUp &&
-      typeof target.observer._extMouseUp == "function"
+      !!this.observer._extMouseUp &&
+      typeof this.observer._extMouseUp == "function"
     )
-      target.observer._extMouseUp(target.mouse, e);
+      this.observer._extMouseUp(this.mouse, e);
     if (!!customMouseUp && typeof customMouseUp == "function")
-      customMouseUp(target.mouse, e);
-    target.mouse.button = -1;
+      customMouseUp(this.mouse, e);
+    this.mouse.button = -1;
   };
 
   // скролл
@@ -599,42 +628,42 @@ p.mouseControls = function(options, target) {
     if (false == !!e) e = window.e;
     let direction =
       (e.wheelDelta ? e.wheelDelta / 120 : e.detail / -3) || false;
-    target.mouse.wheel = direction;
+    this.mouse.wheel = direction;
     if (direction) {
       if (
-        !!target.observer._extMouseWheel &&
-        typeof target.observer._extMouseWheel == "function"
+        !!this.observer._extMouseWheel &&
+        typeof this.observer._extMouseWheel == "function"
       )
-        target.observer._extMouseWheel(target.mouse, e);
+        this.observer._extMouseWheel(this.mouse, e);
       if (!!customMouseWheel && typeof customMouseWheel == "function")
-        customMouseWheel(target.mouse, e);
+        customMouseWheel(this.mouse, e);
     }
   };
 
   // курсор вышел из области элемента
   this._mouseOut = function(e) {
-    target.mouse.button = -1; // отключить драг
-    target.mouse.drag = 0;
+    this.mouse.button = -1; // отключить драг
+    this.mouse.drag = 0;
     if (
-      !!target.observer._extMouseOut &&
-      typeof target.observer._extMouseOut == "function"
+      !!this.observer._extMouseOut &&
+      typeof this.observer._extMouseOut == "function"
     )
-      target.observer._extMouseOut(target.mouse, e);
+      this.observer._extMouseOut(this.mouse, e);
     if (!!customMouseOut && typeof customMouseOut == "function")
-      customMouseOut(target.mouse, e);
+      customMouseOut(this.mouse, e);
   };
 
   // курсор попал в область элемента
   this._mouseOver = function(e) {
-    target.mouse.button = -1; // отключить драг
-    target.mouse.drag = 0;
+    this.mouse.button = -1; // отключить драг
+    this.mouse.drag = 0;
     if (
-      !!target.observer._extMouseOver &&
-      typeof target.observer._extMouseOver == "function"
+      !!this.observer._extMouseOver &&
+      typeof this.observer._extMouseOver == "function"
     )
-      target.observer._extMouseOver(target.mouse, e);
+      this.observer._extMouseOver(this.mouse, e);
     if (!!customMouseOver && typeof customMouseOver == "function")
-      customMouseOver(target.mouse, e);
+      customMouseOver(this.mouse, e);
   };
   if (this.main.elObserver.addEventListener) {
     this.main.elObserver.addEventListener("mousemove", this._mouseMove, false);
@@ -682,7 +711,7 @@ p.mouseControls = function(options, target) {
 //        freezeScaleX,freezeScaleY: - заморозка масштаба (-1,0,1) -1 - нижний порог +1-верхний 0 - не имееет блокировки -2 заблокирован полностью
 //    }
 
-p.observerControls = function(options, target, maskEnabled) {
+p.observerControls = function(options = {}, maskEnabled) {
   // Создаем массив масок
   if (!maskEnabled) {
     this.maskLayers = new Array();
@@ -692,29 +721,7 @@ p.observerControls = function(options, target, maskEnabled) {
   this.iterationMaskCount = 0;
   this.iterationMaskShowCount = 0;
 
-  let optDefault = {
-    move: true, // авто перемещение
-    autoRendering: true, // авто обновление
-    zoomDeltaX: 2, // коэффициент масштаба
-    zoomDeltaY: 2, // коэффициент масштаба
-    baseScaleX: 1, // база масштаба
-    baseScaleY: 1, // база масштаба
-    zoomLevelX: 0, // Уровень зума относително базы
-    zoomLevelY: 0, // Уровень зума относително базы
-    scalingType: "twin", // 'twin','x','y'
-    discreteBasisScale: false,
-    scope: false,
-    scopeXLeft: null,
-    scopeXRight: null,
-    scopeYTop: null,
-    scopeYBottom: null,
-    fixScaling: "none", // none, min, max, custom
-    minScaleX: null,
-    minScaleY: null,
-    maxScaleX: null,
-    maxScaleY: null
-  };
-  this.observer = this.merge(optDefault, options || {});
+  this.observer = { ...DEFAULT_CONFIG_OBSERVER, ...options };
   this.calcObserver();
   this.scopeCalculation(this.main, true);
 
@@ -723,42 +730,43 @@ p.observerControls = function(options, target, maskEnabled) {
     this.observer._extMouseMove = function(mouse, e) {
       if (mouse.button != -1) {
         // drag map
-        target.main.x = target.observer.moveX + mouse.x;
-        target.main.y = target.observer.moveY + mouse.y;
-        target.scopeCalculation(target.main, false);
-        target._drag = true;
-        target.needRender.coerceNotRenderMask = true;
-        target.drawScene(); // нужно передать признак
+        this.main.x = this.observer.moveX + mouse.x;
+        this.main.y = this.observer.moveY + mouse.y;
+        this.scopeCalculation(this.main, false);
+        this._drag = true;
+        this.needRender.coerceNotRenderMask = true;
+        this.drawScene(); // нужно передать признак
       }
     };
     this.observer._extMouseUp = function(mouse, e) {
-      target.observer.moveX = 0;
-      target.observer.moveY = 0;
-      target._drag = false;
+      this.observer.moveX = 0;
+      this.observer.moveY = 0;
+      this._drag = false;
       if (
-        target.mouse.downX != target.mouse.x ||
-        target.mouse.downY != target.mouse.y
+        this.mouse.downX != this.mouse.x ||
+        this.mouse.downY != this.mouse.y
       ) {
-        target.needRender.coerceMask = true; //принудить к перерисовке маски
-        target.needRender.coerceNotRenderMask = false; // снять запрет на перерисовку маски (если кто то наложил)
+        this.needRender.coerceMask = true; //принудить к перерисовке маски
+        this.needRender.coerceNotRenderMask = false; // снять запрет на перерисовку маски (если кто то наложил)
       }
-      target.drawScene(); // нужно передать признак
+      this.drawScene(); // нужно передать признак
     };
     this.observer._extMouseDown = function(mouse, e) {
-      target.observer.moveX = target.main.x - mouse.x;
-      target.observer.moveY = target.main.y - mouse.y;
+      this.observer.moveX = this.main.x - mouse.x;
+      this.observer.moveY = this.main.y - mouse.y;
     };
     this.observer._extMouseWheel = function(mouse, e) {
-      target.zoom(
+      this.zoom(
         {
           x: mouse.x,
           y: mouse.y
         },
         mouse.wheel
       );
-      target.drawScene(); // нужно передать признак
+      this.drawScene(); // нужно передать признак
     };
   }
+  return this;
 };
 
 p.zoom = function(position, z) {
