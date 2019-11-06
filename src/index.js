@@ -54,25 +54,7 @@ this.emjs = this.emjs || {};
         return 0;
       }
     };
-    /*    this.main.getY = function (y) {
-         if (!isNaN(this.y) && !isNaN(this.scaleY)) {
-         var _y= (this.y + y * this.scaleY) << 0;
-         var yc=800;
-         var ycMax=12000/this.scaleY;
-         var dy =yc-_y;
-         var k=1+dy/ycMax;
-         //if (k>4) k=4;
-         if (k<1) k=1;
 
-
-
-
-         return yc-dy/k;
-         } else {
-         return 0;
-         }
-         }
-         */
     // определение Х размера на сцене (из мировых в координаты сцены)
     this.main.getValueX = function(value, no_round) {
       if (!isNaN(this.scaleX)) {
@@ -325,16 +307,6 @@ this.emjs = this.emjs || {};
             }
           } else {
             this.layers[i].visible = !stat;
-            // Найти привязанную маску этого слоя
-            /* if (engineMap.maskLayers && engineMap.maskLayers.length > 0) {
-                         for (var j = 0; j < engineMap.maskLayers.length; j++) {
-                         if (engineMap.maskLayers[j].idRenderScene == this.layers[i].id) {
-                         engineMap.maskLayers[j].enable = !stat;
-
-                         break;
-                         }
-                         }
-                         }*/
           }
         }
       } else if (typeof name == "object" && name.length > 0) {
@@ -345,7 +317,6 @@ this.emjs = this.emjs || {};
         for (var i = 0; i < this.layers.length; i++) {
           var _bb = true;
           for (var k = 0; k < name.length; k++) {
-            //                        this.sortLayers.push(name[k]);
             if (this.layers[i].name == name[k]) {
               this.layers[i].visible = stat;
               _bb = false;
@@ -363,15 +334,6 @@ this.emjs = this.emjs || {};
           }
           if (_bb) {
             this.layers[i].visible = !stat;
-            // Найти привязанную маску этого слоя
-            /* if (engineMap.maskLayers && engineMap.maskLayers.length > 0) {
-                         for (var j = 0; j < engineMap.maskLayers.length; j++) {
-                         if (engineMap.maskLayers[j].idRenderScene == this.layers[i].id) {
-                         engineMap.maskLayers[j].enable = !stat;
-                         break;
-                         }
-                         }
-                         }*/
           }
         }
       }
@@ -927,7 +889,6 @@ this.emjs = this.emjs || {};
       } else this.main.scaleY = this.observer.maxScaleY;
       this.observer._baseScaleY = tmp.scale;
       this.observer.zoomLevelY = tmp.level;
-      // if (M.observer.freezeScaleY==-1){M.observer.freezeScaleY=-2;} else
       this.observer.freezeScaleY = 1;
     }
 
@@ -1089,22 +1050,7 @@ this.emjs = this.emjs || {};
       this.observer.minScaleScopeX = this.main.width / this.observer.dX;
     if (this.observer.dY != 0)
       this.observer.minScaleScopeY = this.main.height / this.observer.dY;
-    /*
-         if (this.observer.discreteBasisScale === true && this.observer.baseScaleX > 0) {
-         var newX = Math.floor(this.observer.minScaleScopeX / this.observer.baseScaleX) * this.observer.baseScaleX;
-         var newY = Math.floor(this.observer.minScaleScopeY / this.observer.baseScaleX) * this.observer.baseScaleY;
-         if (Math.abs(this.observer.minScaleScopeX - newX) > Math.abs(newX + this.observer.baseScaleX - this.observer.minScaleScopeX)){
-         this.observer.minScaleScopeX = newX + this.observer.baseScaleX;
-         } else {
-         this.observer.minScaleScopeX = newX;
-         }
-         if (Math.abs(this.observer.minScaleScopeY - newY) > Math.abs(newY + this.observer.baseScaleY - this.observer.minScaleScopeY)){
-         this.observer.minScaleScopeY = newY + this.observer.baseScaleY;
-         } else {
-         this.observer.minScaleScopeY = newY;
-         }
-         }
-         */
+
     //Определяем блокирующий нижний масштаб
     this.observer.minScaleFreeze = null;
     switch (this.observer.fixScaling) {
@@ -1148,9 +1094,7 @@ this.emjs = this.emjs || {};
     }
 
     // Опеределяем текущее смещение базы мастаба
-    /* this.main.scaleX = this.observer.minScaleFreeze;
-         this.main.scaleY = this.observer.minScaleFreeze;
-         */
+
     var tmpX = getZoomLevelBase(
       Math.max(this.observer.minScaleFreeze, this.main.scaleX),
       this.observer.baseScaleX,
@@ -1161,10 +1105,7 @@ this.emjs = this.emjs || {};
       this.observer.baseScaleY,
       this.observer.zoomDeltaY
     );
-    /*
-        var tmpX = getZoomLevelBase(this.main.scaleX, this.observer.baseScaleX, this.observer.zoomDeltaX);
-        var tmpY = getZoomLevelBase(this.main.scaleY, this.observer.baseScaleY, this.observer.zoomDeltaY);
-*/
+
     this.observer._baseScaleX = tmpX.scale;
     this.observer.zoomLevelX = tmpX.level;
     this.observer._baseScaleY = tmpY.scale;
